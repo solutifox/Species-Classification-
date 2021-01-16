@@ -1,1 +1,3 @@
-# Species-Classification-
+# Species Classification
+
+We have two distinct species Microtus Subterraneus and Microtus Multiplex. The two species have different chromosomes. The two species overlap in the alps of southern Switzerland and northern Italy. In some regions such as Belgium, they can be found in the same elevations. The two species morphologically are indistinguishable. We know that there is not a reliable criterion. to tell apart the two species, based on the cranial morphology. It would be useful to for researchers to have a reliable way to distinguish between the two species. This project’s objective is to develop a model that can help research identify which species is based on their morphometric characteristics.
