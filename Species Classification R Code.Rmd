@@ -1,0 +1,263 @@
+---
+title: "Final_project_2"
+author: "Mohamed Ahmed"
+date: "11/26/2020"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE,fig.align="center"}
+knitr::opts_chunk$set(message=F,warning=F,echo=F,fig_height=10,fig_width=7,cache = F)
+```
+
+
+
+```{r}
+library(mgcv)
+library(GGally)
+library(dplyr)  
+library(corrr) 
+library(knitr)
+library(SmartEDA)
+library(gridExtra)
+library(DataExplorer)
+```
+
+
+
+# Introduction:
+
+The purpose of this report is to analyze and explain the relationship between four forensic likelihood ratios for different ink samples. We are given three univariate likelihood ratios linking to the “X”,” Y”, and” Z” Which are measures of color which were created. The second component of the analysis is to an omnibus LR that (Dr. Saunders) created. We want to analyze the given data and figure out if there is a relationship between the marginal LR’s (LLR.x, LLR.y, and LLR.z) and the Omnibus LR, and explain the relationship if there any.  
+
+
+
+# Exaplantory Data Analysis:
+
+Before we started out analysis, the first thing we did was perform some initial data inspection. We decided to drop the column comparison. We constructed a matrix of plots to visualize the data. Then we used constructed histograms to look at the distribution of the data. **Figure 2** shows that the covariates are very skewed to the right. We can see that the variable of interest omnibus LLR is skewed to the right as well, and it is suspected that is normally distributed. To understand more about the how covariates are correlated, we constructed a matrix **(Table 2)** that has the correlation coefficients. we can see that the correlation between LLR.x and LLR.y is **0.446** which is a bit weaker positive correlation compared to the positive correlation between LLR.x and LLR.z **0.666** which is a moderate relationship. also, the relationship between LLR.y and LLR.z is a positively moderate relationship with a correlation coefficient of **0.618**. 
+Form **figure 1**, there is a very clear curved upward positive trend between omnibus and LLR.x. It could be a linear relationship that requires a polynomial term. The relationship between omnibus and the other two covariates seem to be constant for a bit and then there is an upward trend towards the end. By looking at **figure 1**, the scatter plots for Omnibus Likelihood ratio and each of the Log Likelihood ratio of each color(X,Y,Z) shows that there is a potential outlier in middle right part of the graphs which belong to type *bw*. We are not sure if a linear relationship exists between the variable of interest and the covariates LLR.x; therefore, we will start our analysis by fitting a simple linear regression model.
+
+# Model
+
+## Linear Regression Models:
+
+initially, we assumed a linear relationship, then We started our analysis by constructing multiple simple linear regression models with one explanatory variable for each model to check if there is a linear relationship between the variable of interest, in this case, LLR.omnibus and the covariates. in **figure 3 **, We have fitted the simple linear regression line in each plot,  to check if a model captures the relationship between the response variable and each of the covariates but we can clearly see that the linear models do not fully capture the trend and do not explain the relationship between The explanatory variables and omnibus. The only thing that was noticeable was the fact that that the relationship between Omnibus LLR and LLR.x looked like it could be explained by a polynomial model.
+
+## Polynomial Model: 
+
+Since we could not see any linear relationship between the response variable and the covariates LLR(x,y,z), We tried a more general Sami-parametric lowess smoother for each covariate to try to capture the relationship between the response variable and the covariates. we can see from **Figure 4** that the relationship is non-linear between the response variable omnibus.LLR and the covariates. since we have more than one explanatory variable, using generalized additive is more adequate than using a single scatter plot smoother.
+
+## Generlized Additive Model:
+
+Since we have a non-linear relationship, we decided to use a generalized additive model because it can help us model the non-linear relationship between the response variable and the covariates using smoothers.
+
+## GAM Variable Selection: 
+
+Before we try to select a model, we assumed normal errors. We used a simple logical way to select the variables that will enter the model as parametric and non-parametric variables. initially, A full model was built that included all covariates as smoothed terms except for Type which was entered into the model as a parametric term. we knew that the three covariates LLR.x, LLR.y, and LLR.z need smoothing from our previous models. Next step was to remove a variable at time and see how Generalized cross validation value changes. GCV is considered the most logically consistent method to use for variable selection process. After constructing many models and comparing them using GCv, the model with the lowest GCV **0.0366034****(Table 3)** was the full model. However, we decided to select **Model 2** as the selected model because the variable **Type** was dropped because its P-value was below the significance level $\alpha=0.5$. The GCV **0.0366560** for the selected model and the optimal model was insignificant. Table 2 displays all the models that were constructed along with more information about each model. 
+
+## GAM Model Results: 
+
+The parametric term is the intercept, and its p-value is significant at an $\alpha=0.5$. **Table 4** shows the results for the parametric terms. **Table 5** shows the smooth components of our model regarding the marginal LR’s (i.e. LLR.x, LLR.y, and LLR.z) and its relationship with the Omnibus LR which suggests that all the smoothed  marginal LR"s are significant at an $\alpha=0.5$. The GCV score is an estimate of mean square prediction error which can be found in **Table 6**. For our model, our **GCV = 0.036656** which is the second lowest out of all the models we have attempted to build. Also, our model's **AIC = -382.9581** is the second lowest out of all the models we built. we looked at the partial contributions of the covariates. Each plot shows the effects covariates have on the response. From **Figure 5a**, the first plot shows that LLR.x stays flat and constant until about zero and then it spikes, and finally decreases after the value of **3**. **Figure 5b** shows that LLR.y does not have much of an effect until**zero** then it increases for a bit but then decreases quickly. From **Figure 5c**,we see that LLR.z does not have an effect up until zero then it increases and finally, it decreases at the end. It seems that LLR.x has the most effect of the response variable. 
+
+## GAM Model Diagnostics: 
+
+The residuals plot show that error distributed randomly around zero. There could be a pattern in the residuals which is not a good sign. Also, the histogram shows a somehow a normal distribution and the response vs fitted plot shows a linear relationship. 
+
+# Conclusion:
+
+We have analyzed the LLR data to check if there is a relationship between the marginal LLRs (x, y, z) and omnibus LLR. We have explored the data to gain a better understanding then we tried to use different parametric and non-parametric methods to find if there is a relationship and if there is one figure out the nature of the relationship. we can conclude that there is a relationship between the marginal LLRs (x, y, z) and omnibus likelihood ratio and that the nature of the relationship is non-linear.
+ 
+
+# Figures and Tables 
+
+
+# Data 
+
+  &nbsp; | Symbol         | Description
+  -------|----------------|--------------------------------------
+  &nbsp; | $Comp$         | Comparison of interest (from 1 to 820). 
+  &nbsp; | $Omni.LLR.int$ | numeric values of for the Log of the Omnibus likelihood ratio, this is the response variable we are interested in.
+  &nbsp; | $Type$         | Type of comparison, either “wi” for within-source comparison or “bw” for between-source comparison 
+  &nbsp; | $LLR.x$        | The Log Likelihood ratio for the X color variable
+  &nbsp; | $LLR.y$        | The Log Likelihood ratio for the Y color variable
+  &nbsp; | $LLR.z$        | The Log Likelihood ratio for the Z color variable
+  ---------------------------------------------------------------
+  
+
+```{r, warning=FALSE}
+# Load data 
+llr.data <- read.csv("~/School/Stat601/dat.LLR.int.csv")
+attach(llr.data)
+
+#Drop the first column 
+llr.data <- llr.data[-c(1:2)]
+
+cat("Data Dimensions", "\n")  
+dim(llr.data)
+
+#drop Type for correlations matrix 
+llr.data.cor <- llr.data[-c(2)]
+```
+
+
+```{r}
+# Statistical Summary
+sts <- ExpNumStat(llr.data,by ="A",Outlier=TRUE,round= 2)[,c(1,2,4:6,9:10,12:15,18,23)]
+kable(sts , caption = "Table 1: Statistical Summary")
+```
+
+
+```{r, fig.height=9, fig.width=11}
+ggpairs(llr.data, color=2, alpha=0.4, ggplot2::aes(colour=Type))+
+  ggtitle("Figure 1: Matrix Of Plots")
+```
+
+```{r}
+# Histograms 
+plot_histogram(llr.data, title = "Figure 2: Histograms for continous variables")
+```
+
+
+
+
+```{r}
+#Correlation Matrix 
+llr.cor = cor(llr.data.cor)
+kable(round(llr.cor,3) , caption = "Table 2: Variables' Correlation Table")
+```
+
+
+
+```{r, fig.height=9, fig.width=10}
+# LInear regression model 
+llr_lm <- lm(Omni.LLR.int ~ LLR.x , data =llr.data)
+p1 <- ggplot(llr.data, aes(LLR.x, Omni.LLR.int)) + geom_point() + geom_smooth(method = lm)+
+labs(title = "Figure 3a: Fitting a Simple Linear Model Line")
+
+
+# Linear regression model 
+llr_lm1 <- lm(Omni.LLR.int ~ LLR.y, data = llr.data)
+p2 <- ggplot(llr.data, aes(LLR.y, Omni.LLR.int)) + geom_point() + geom_smooth(method = lm)+
+labs(title = "Figure 3b: Fitting a Simple Linear Model Line")
+
+# Linear regression model 
+llr_lm2 <- lm(Omni.LLR.int ~ LLR.z, data = llr.data)
+p3 <- ggplot(llr.data, aes(LLR.z, Omni.LLR.int)) + geom_point() + geom_smooth(method = lm)+
+  labs(title = "Figure 3c: Fitting a Simple Linear Model Line")
+
+grid.arrange(p1,p2,p3)
+
+```
+
+
+
+```{r, fig.height=9, fig.width=10}
+par(mfrow=c(2,2),oma = c(0, 0, 2, 0))
+
+#Lowess smoother for each explanatory variable 
+x <- llr.data$LLR.x
+y <- llr.data$Omni.LLR.int
+llr_lowess <- lowess(x, y)
+plot(Omni.LLR.int ~ LLR.x, data = llr.data)
+lines(llr_lowess, lty = 2, col="3")
+
+
+#Lowess smoother for each explanatory variable 
+x1 <- llr.data$LLR.y
+y1 <- llr.data$Omni.LLR.int
+llr_lowess1 <- lowess(x, y)
+plot(Omni.LLR.int ~ LLR.y, data = llr.data)
+lines(llr_lowess1, lty = 2, col="4")
+
+#Lowess smoother for each explanatory variable 
+x2 <- llr.data$LLR.z
+y2 <- llr.data$Omni.LLR.int
+llr_lowess2 <- lowess(x, y)
+plot(Omni.LLR.int ~ LLR.z, data = llr.data)
+lines(llr_lowess2, lty = 2, col="6")
+
+mtext("Figure 4: Lowess smoother for each Explantory variable", side = 1, line = -53, outer = TRUE)
+
+```
+
+
+```{r}
+# selection process 
+
+mod.gam1 = gam(Omni.LLR.int ~ s(LLR.x) + s(LLR.y) + s(LLR.z), data = llr.data)
+
+mod.gam2 = gam(Omni.LLR.int ~ Type + s(LLR.x) + s(LLR.y) + s(LLR.z), data = llr.data)
+
+mod.gam3 = gam(Omni.LLR.int ~ Type + s(LLR.y) + s(LLR.z), data=llr.data)
+
+mod.gam4 = gam(Omni.LLR.int ~ Type + s(LLR.x) + s(LLR.z), data=llr.data)
+
+mod.gam5 = gam(Omni.LLR.int ~ Type + s(LLR.x) + s(LLR.y), data=llr.data)
+
+mod.gam6 = gam(Omni.LLR.int ~ s(LLR.x) + s(LLR.y), data=llr.data)
+
+mod.gam7 = gam(Omni.LLR.int ~ s(LLR.x) + s(LLR.z), data=llr.data)
+
+mod.gam8 = gam(Omni.LLR.int ~ s(LLR.y) + s(LLR.z), data=llr.data)
+
+```
+
+
+
+```{r}
+# Summary table of model selection measures
+
+Modelstable <- data.frame(
+    Model = c("Full-Model", "Model-2", "Model-3", "Model-4", "Model-5", "Model-6", "Model-7", "Model-8"),
+    GCV = c(0.03660343 , 0.03665596, 3.747096, 1.601869, 0.4605303, 0.4686593, 1.675757,4.222513), AIC = c(mod.gam1$aic, mod.gam2$aic, mod.gam3$aic, mod.gam4$aic, mod.gam5$aic, mod.gam6$aic, mod.gam7$aic, mod.gam8$aic), TotalModelDef = c(sum(mod.gam1$edf), sum(mod.gam2$edf), sum(mod.gam3$edf), sum(mod.gam4$edf), sum(mod.gam5$edf), sum(mod.gam6$edf), sum(mod.gam7$edf),sum(mod.gam8$edf)))
+
+kable(Modelstable, caption = "Table 3: Models' selection Information")
+```
+
+```{r}
+#Selected Model 
+selec.model <- gam(Omni.LLR.int ~ s(LLR.x) + s(LLR.y) + s(LLR.z), data = llr.data)
+
+#Parametric Terms Table 
+kable(summary(selec.model)$p.table, 
+  caption = "Table 4: Parametric Terms significance of the GAM Model")
+
+#Non-Parametric Terms Table 
+kable(summary(selec.model)$s.table, 
+  caption = "Table 5: Smooth terms Significance")
+
+
+# Model performance table 
+Model.Per <- data.frame( "GCV" = selec.model$gcv.ubre, "AIC" = selec.model$aic, "Total Model DoF"= sum(selec.model$edf))
+kable(Model.Per, caption = "Table 6: Information on the Selected Model")
+
+
+```
+
+```{r, fig.height=9, fig.width=10}
+#Plots
+
+p.1 <- ggplot(llr.data, aes(LLR.x, Omni.LLR.int) ) + geom_point() + stat_smooth(method = gam, formula = y ~ s(x))+ labs( title = "Figure 5a: Partial Contribution of LLR.x")
+p.2 <- ggplot(llr.data, aes(LLR.y, Omni.LLR.int) ) +geom_point() +
+  stat_smooth(method = gam, formula = y ~ s(x))+labs( title = "Figure 5b: Partial Contribution of LLR.y")
+p.3 <- ggplot(llr.data, aes(LLR.z, Omni.LLR.int) ) + geom_point() +
+  stat_smooth(method = gam, formula = y ~ s(x))+labs( title = "Figure 50c:  Partial Contribution of LLR.z")
+
+grid.arrange(p.1,p.2,p.3)
+
+```
+
+
+```{r}
+# Residuals 
+par(mfrow =c(2,2))
+gam.check(selec.model)
+```
+
+
+# Citations 
+
+Generalized Additive Models /. (2019, February 17). Retrieved December 07, 2020, from https://m-clark.github.io/generalized-additive-models/application.html
+
+Everitt, Brian, and Torsten Hothorn. A Handbook of Statistical Analyses Using n SECOND
+EDITION. Taylor and Francis Group LLC, 2010.
