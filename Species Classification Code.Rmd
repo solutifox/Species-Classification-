@@ -1,0 +1,220 @@
+---
+title: "Species Classification"
+author: "Mohamed Ahmed"
+date: "11/25/2020"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message=F,warning=F,echo=F,fig_height=10,fig_width=7,cache = F)
+```
+
+
+```{r, warning=FALSE}
+library(Flury)
+library(ggplot2)
+library(knitr)
+library(GGally)
+library(DataExplorer)
+library(heatmaply)
+library(visibly)
+library(SmartEDA)
+library(MLmetrics)
+library(boot)
+library(dplyr)
+library(MASS)
+```
+
+ 
+
+
+
+
+```{r}
+#Load Data 
+data("microtus")
+```
+
+
+
+# Introduction:
+
+We have two distinct species Microtus Subterraneus and Microtus Multiplex. The two species have different chromosomes. The two species overlap in the alps of southern Switzerland and northern Italy. In some regions such as Belgium, they can be found in the same elevations. The two species morphologically are indistinguishable. We know that there is not a reliable criterion. to tell apart the two species, based on the cranial morphology. It would be useful to for researchers to have a reliable way to distinguish between the two species. This project’s objective is to develop a model that can help research identify which species is based on their morphometric characteristics. 
+
+# Data: 
+
+The data that was used for this project was collected during a study. During the study, eight morphometric variables were collected by one of the authors (Salvioni). The data is made up of 288 specimens which was collected in central Europe and in Toscana. Out of the 288 specimens’ samples only 89 specimens the chromosomes were analyzed to identify the species. The remaining 199 specimens’ samples were not identified and only their morphometric characteristics are given. The table below shows a brief description of the data. 
+
+
+
+# Exploratory data analysis:
+
+From out summary statistics, we can see that we have three different groups: multiplex with 43 records, 46 subterraneus records, and unknown with 199 records. The means and the medians or all variables are pretty close, and we can say that all variables seem to have a normal distribution. 
+**Figure 1 **shows Univariate Graphs of the data such as kernel density plots, box plots, histograms, scatter plots, and bar plots. Different levels have different colors. blue represents (Unknown), Green represents(subterraneus), and red represents(multiplex). The box plots show that there is not much difference in means between different group for all variables. We can see that histograms show a normal distribution of the data. The qq plot shows normal distribution as well. scatter plots indicate that there is a strong correlation between many independent variables and the relationship between most variables seems to be linear. The bar plot shows that out of the three groups the unknown group is most occurring group which will not be good for our model because the training set will be small. Next, we constructed a heat map to look at the correlation between independent variables. **Table 2** shows the variables with the lowest correlation between them. 
+
+
+# Model:
+
+## Assumptions: 
+
+We will assume binary logistic regression, linearity of independent variable, and that there is small to no multicollinearity  
+Since the problem is a classification problem and we were asked to use generalized liner models, a logistic model is suitable for this kind of classification problems. Since we were given 89 specimens samples that are known and we want to predict the 199 unknown samples, we split our data into two different data sets. one to train the model and another dataset to use for predictions. also, we have converted our two classes into 1 and o for modeling purposes. 
+
+
+## Model Selection:
+
+We have selected our model by trial-and-error method, and we have attempted to use stepwise selection method using both directions which gives the model with the best AIC Value. We have the selection process by constructing a logistic model using all explanatory variables. None of the explanatory variables for this model were significant at $\alpha =0.5$. To check the model accuracy, we calculated mean squared error and we performed 10-fold cross validation. MSE for this model was low *2.6%* and cross validation accuracy for this model was high **8.1%**. The second model that was constructed with variables that we considered to have low correlation from **Table 2**. This model had two variables that were significant at $\alpha =0.5$ which were **Intercept & M1Left**. There rest of the explanatory variables were insignificant. The MSE for this model was **3.5%** and the cross-validation error was **5.1%**. The next step was to use the stepwise selection method. The MSE for selected model by the procedure was **2.8%** and the cross-validation error was **5.8**. After a trial and error process, we selected a simple model with two explanatory variables. This model has the lowest cross validation error **4.6%**. we used cross validation error as a criterion to select the best model. **Table 3** summarizes different error measures for different models. 
+
+
+## Selected Model Interpretation: 
+
+This model was selected because it had the lowest cross validation error among all the models that were constructed. Also, the model has an AIC that is close to the AIC of the model that was given by the stepwise method. **Table 3** shows the **AIC** values for all models.  The model has the intercept and two explanatory variables **Intercept & M1Left**. all of them were significant at an $\alpha =0.5$ level. The AIC for the model was low but not the lowest compared to all the other models. The difference between null deviance and residual deviance gives us an idea whether we have a good fit or not. The difference between the Null device and the residual deviance is big enough to consider our model good. from the cross validation, we conclude that this model is about 95.4% accurate. 
+
+
+# Conclusion and Recommendations:
+
+We have explored the Microtus data and did explanatory data analysis. From our analysis, we determined that a logistic model is suitable for this problem. We have selected the most optimal model using 10 K fold cross validation to measure the accuracy of our model and we determined that our best model had approximately **95%** accuracy. We trained our model using the 89 known specimens and we used the unknown 199 samples to make prediction. We were able to classify the 199-unknown data into the two known classes. Further details about the classified specimens can be found in **Table 5**
+This model can help researchers and scientist save a lot of time by using the model to classify specimens. Also, the researchers will be able to focus more on collecting unique characteristics data that can help data scientist build a model that can identify the specimens faster.
+
+
+
+# Figures And Tables: 
+
+##Data
+
+ &nbsp; | Symbol         | Description
+  -------|----------------|--------------------------------------
+  &nbsp; | $Group$        | a factor with levels multiplex subterraneus unknown code
+  &nbsp; | $M1Left$       | Width of upper left molar 1 (0.001mm)      
+  &nbsp; | $M2Left$       | Width of upper left molar 2 (0.001mm) 1=censored, 2=dead
+  &nbsp; | $M3Left$       | Width of upper left molar 3 (0.001mm)
+  &nbsp; | $Foramen$      | Length of incisive foramen (0.001mm)
+  &nbsp; | $Pbone$        | Length of palatal bone (0.001mm) symptomatic but completely ambulatory, 2=in bed<50% ofthe day,3=in bed>50% of the day but not bedbound, 4 =        bedbound
+  &nbsp; | $Length$       | Condylo incisive length or skull length (0.01mm)
+  &nbsp; | $Height$       | Skull height above bullae (0.01mm)
+  &nbsp; | $Rostrum$      | Skull width across rostrum (0.01mm)
+  ---------------------------------------------------------------
+
+
+```{r}
+# Summary Statistics 
+kable(summary(microtus), caption = "Table 1: Statistical Summary")
+
+```
+
+
+```{r, fig.height=12, fig.width=11}
+#ggpairs
+ggpairs(microtus, columns = 1:9, ggplot2::aes(color=Group), upper = list(continuous = wrap("cor", size = 4)))+
+  ggtitle("Figure 1: Matrix Of Plots")
+```
+
+
+
+
+```{r, warning=FALSE}
+plot_correlation(microtus, type = "continuous",  ggtheme = theme_gray(),   title = "Figure 2: Correlation Matrix Graph ")
+```
+
+
+```{r}
+# Independent variables that have the lowest correlations between them 
+low.corr <- data.frame(low_corr_Variables = c("Pbone", "Foramen", "M1left", "Height"))
+kable(low.corr, caption = "Table 2: Varaibles with low Correlations")
+
+```
+
+
+
+
+```{r}
+set.seed(700)
+#splitting the data into 89 obs and 199 obs 
+model.data = microtus[c(1:89),]
+test.data = microtus[c(90:288),]
+
+
+model.data$Group =ifelse(model.data$Group=="multiplex", 1, 0)
+
+
+```
+
+
+
+```{r, warning=F}
+set.seed(700)
+#Logistic Model 
+Full.model <- glm(Group~., data=model.data, family = binomial())
+mse.full <- MSE(Full.model$fitted.values, model.data$Group)
+cv.glm.full <- cv.glm(model.data, Full.model,K=10)$delta[1]
+aic.f <- Full.model$aic
+# Model Including variables with low correlation 
+model1 <- glm(Group~Pbone+Foramen+M1Left+Height, data=model.data, family = binomial())
+mse.1 <- MSE(model1$fitted.values, model.data$Group)
+cv.glm.1 <- cv.glm(model.data, model1, K=10)$delta[1]
+aic.1 <- model1$aic
+
+# stepwise selection method 
+step.m <- stepAIC(Full.model,direction = "both", trace = F)
+mse.step <- MSE(step.m$fitted.values, model.data$Group)
+cv.glm.step <- cv.glm(model.data, step.m, K=10)$delta[1]
+aic.step <- step.m$aic
+```
+
+
+
+
+
+```{r, warning=FALSE}
+set.seed(700)
+# selected model
+selected.model <- glm(Group ~ M1Left  + Foramen, 
+    family = binomial(), data = model.data)
+aic <- selected.model$aic
+#predictions 
+pred <- predict(selected.model, test.data, type = "response")
+#MSE
+mse.sel <- MSE(selected.model$fitted.values, model.data$Group)
+
+#cross validation 
+cv.glm.sel <- cv.glm(model.data, selected.model, K=10)$delta[1]
+
+```
+
+
+
+```{r}
+Models.table <- data.frame(
+    Model = c("Full Model", "Low.Correlation.var.Model", "Stepwise Model","Selected Model"),
+    MSE = c(mse.full, mse.1, mse.step, mse.sel),
+    Cross_Validation_Error = c(cv.glm.full, cv.glm.1, cv.glm.step, cv.glm.sel), AIC = c(aic.f, aic.1,aic.step,aic))
+kable(Models.table, caption = "Table 3: Different Models Errors")
+```
+
+```{r}
+# Summary table of the model 
+summary(selected.model)
+# Model performance table 
+Model.Per <- data.frame( "Cross Validation" = cv.glm.sel, "AIC" = selected.model$aic)
+kable(Model.Per, caption = "Table 4: Information on the Selected Model")
+```
+
+
+```{r}
+set.seed(700)
+test.data$prob <- ifelse(pred >= 0.5, "multiplex", "subterraneus")
+kable(table(test.data$prob), caption = "Table 5: Predictions Count")
+Data.predictions <- data.frame(Id = 1:length(pred), prob = test.data$prob)
+write.csv(Data.predictions, file = "Predictions.csv", row.names = F)
+```
+
+# Citations
+
+Kassambara, Thanos, Kassambara, &amp; Sfd. (2018, March 11). Logistic Regression Essentials in R. Retrieved December 07, 2020, from http://www.sthda.com/english/articles/36-classification-methods-essentials/151-logistic-regression-essentials-in-r/
+
+Everitt, Brian, and Torsten Hothorn. A Handbook of Statistical Analyses Using n SECOND
+EDITION. Taylor and Francis Group LLC, 2010.
+
